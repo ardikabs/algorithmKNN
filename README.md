@@ -12,6 +12,6 @@ Validation Model :
   5. Bootstrap
   
 Usage :
-  a. Ganti nilai paramater k sesuai dengan klasifikasi yang digunakan (1-NN,3-NN,5-NN)
-  b. Ganti nilai paramater eksperimen sesuai dengan jumlah eksperimen yang digunakan
-  c. Fungsi readFile() disesuaikan dengan jenis format file dataset buka comment apabila file format excel.
+  1. Ganti nilai paramater k sesuai dengan klasifikasi yang digunakan (1-NN,3-NN,5-NN)
+  2. Ganti nilai paramater eksperimen sesuai dengan jumlah eksperimen yang digunakan
+  3. Fungsi readFile() disesuaikan dengan jenis format file dataset buka comment apabila file format excel.
