@@ -15,3 +15,5 @@ Usage :
   1. Ganti nilai paramater k sesuai dengan klasifikasi yang digunakan (1-NN,3-NN,5-NN)
   2. Ganti nilai paramater eksperimen sesuai dengan jumlah eksperimen yang digunakan
   3. Fungsi readFile() disesuaikan dengan jenis format file dataset buka comment apabila file format excel.
+  4. File dataIris.py data diubah menjadi object
+  5. Menghitung jarak menggunakan fungsi distance() berada di File dataIris.py
