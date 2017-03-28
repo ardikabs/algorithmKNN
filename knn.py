@@ -3,7 +3,7 @@
 ###################
 
 from operator import itemgetter
-from dataIris import Data as dataFlower
+from data import Data as dataIris
 import math
 import random
 import json
@@ -21,7 +21,7 @@ def readFile(file = None):
         for i in range(len(datalist)):
             line = datalist[i]
             list = line.split(',')
-            temp = dataFlower(i,list[0],list[1],list[2],list[3],list[4])
+            temp = dataIris(i,list[0],list[1],list[2],list[3],list[4])
             dataset.append(temp)
 
             if list[4] not in jenis_kelas:
