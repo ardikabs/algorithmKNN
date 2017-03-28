@@ -1,13 +1,19 @@
+###################
+###IMPORT LIBRARY###
+###################
+
 from operator import itemgetter
 from dataIris import Data as dataFlower
 import math
 import random
 import json
 import sys
+import xlrd
 jenis_kelas = []
 
 #Fungsi Membaca File Data
 def readFile(file = None):
+    #Gunakan code dibawah ini untuk file dengan format .txt / .data / semacamnya
     dataset = []
     with open(file,'r') as ins:
         datalist = ins.read().splitlines()
@@ -21,9 +27,30 @@ def readFile(file = None):
             if list[4] not in jenis_kelas:
                 jenis_kelas.append(list[4])
 
+    #Gunakan code dibawah ini untuk file dengan excel atau csv
+    # df = xlrd.open_workbook(file)
+    # sheet = df.sheet_by_name('Sheet1')
+    # cols = sheet.ncols
+    # rows = sheet.nrows
+    # start_row = 4
+    #
+    # dataset = []
+    # for i in range(rows):
+    #     if i >= start_row:
+    #         data_row = sheet.row_slice(rowx = i, start_colx = 1, end_colx = 4)
+    #         temp = itemData(data_row[0].value,data_row[1].value, data_row[2].value)
+    #         # data = temp.x, temp.y, temp.classification
+    #         dataset.append(temp)
+    #
+    #         # if dataset[i-4][2] not in jenis_kelas :
+    #         #     jenis_kelas.append(dataset[i-4][2])
+    #         if dataset[i-4].classification not in jenis_kelas:
+    #             jenis_kelas.append(dataset[i-4].classification)
+
     return dataset
 
 #Fungsi Memisahkan dataset berdasarkan kelas
+#Digunakan secara khusus untuk holdout (untuk saat ini)
 def dataset_by_kelas(dataset = []):
 
     dataset_kelas = []
@@ -37,8 +64,11 @@ def dataset_by_kelas(dataset = []):
 
     return dataset_kelas
 
-#Fungsi menentukan data training dan sample
-#Dengan metode holdout
+#######################################
+###Fungsi menentukan data training dan sample###
+#######################################
+
+#Validation model holdout
 def holdout(dataset = []):
 
     sample = []
@@ -57,6 +87,7 @@ def holdout(dataset = []):
 
     return proses
 
+#Validation model Random Subsampling
 def random_subsampling(dataset = [], eksperimen = 0):
 
     hasil = []
@@ -78,6 +109,7 @@ def random_subsampling(dataset = [], eksperimen = 0):
 
     return hasil
 
+#Validation model K-Fold Cross
 def kfold(dataset = [], eksperimen = 0):
     hasil = []
     divider = len(dataset) / eksperimen
@@ -115,6 +147,7 @@ def kfold(dataset = [], eksperimen = 0):
 
     return hasil
 
+#Validation model Leave-one-out
 def leaveoneout(dataset=[]):
 
     hasil = []
@@ -135,6 +168,7 @@ def leaveoneout(dataset=[]):
 
     return hasil
 
+#Validation model Bootstrap
 def bootstrap(dataset = [], eksperimen  = []):
     hasil = []
     datasetlength = len(dataset)
@@ -154,6 +188,10 @@ def bootstrap(dataset = [], eksperimen  = []):
         hasil.append(proses)
     return hasil
 
+####################################
+###Fungsi Klasifikasi dengan Algoritma KNN###
+####################################
+
 #Fungsi Algoritma Nearest Neighbor
 def nearest_neighbor(dataset = [],training = [], sample = []):
 
@@ -172,8 +210,8 @@ def nearest_neighbor(dataset = [],training = [], sample = []):
 
         temp_jarak = []
         for j in range(training_length):
-            res = sample[i].distance(training[j])
-            data = {"id-training" : training[j].index, "Jarak" : res,"Dataset" : (training[j].a,training[j].b,training[j].c, training[j].d, training[j].classification) ,"Sample ": (sample[i].a, sample[i].b, sample[i].c, sample[i].d)}
+            result = sample[i].distance(training[j])
+            data = {"id-training" : training[j].index, "Jarak" : result,"Dataset" : (training[j].a,training[j].b,training[j].c, training[j].d, training[j].classification) ,"Sample ": (sample[i].a, sample[i].b, sample[i].c, sample[i].d)}
             result_knn['Result_KNN'][i]['result'].append(data)
 
             #mengambil index dataset_training yang didapat, dan hasil penghitungan jarak_id
@@ -220,14 +258,14 @@ def get_result_by_voting(dataset = [], result_ranking=[], length=0):
 
     for i in range(length):
         hasil_vote = []
-        res = []
+        result = []
         accumulation = [0] * len(jenis_kelas)
         for j in range(k):
             identifier = result_ranking['Rank'][i]['result'][0][j][0]
-            res = vote(dataset[identifier].classification, accumulation)
+            result = vote(dataset[identifier].classification, accumulation)
 
         for j in range(len(jenis_kelas)):
-            item = jenis_kelas[j], res[j]
+            item = jenis_kelas[j], result[j]
             hasil_vote.append(item)
 
         hasil_vote.sort(key=itemgetter(1),reverse=True)
@@ -245,22 +283,34 @@ def vote(selection, accumulation):
     return accumulation
 
 
+####################################
+###Fungsi Main untuk menjalankan program###
+####################################
+
 if __name__ == "__main__" :
-    file = "iris.data"
+    file = "iris.data" #Inisialisasi file name
+
     dataset = readFile(file)
-    default_data = 15
+    default_data = 15 #jumlah data
     k = 5
     eksperimen = 5
-    hasil_ho = holdout(dataset)
-    hasil_rs = random_subsampling(dataset, eksperimen)
-    hasil_kf = kfold(dataset, eksperimen)
-    hasil_loo = leaveoneout(dataset)
-    hasil_bs = bootstrap(dataset,eksperimen)
 
+    hasil_ho = holdout(dataset) #Hasil holdout
+    hasil_rs = random_subsampling(dataset, eksperimen) #Hasil Random Subsampling
+    hasil_kf = kfold(dataset, eksperimen) #Hasil K-Fold Cross
+    hasil_loo = leaveoneout(dataset) #Hasil Leave-One-Out
+    hasil_bs = bootstrap(dataset,eksperimen) #Hasil Bootstrap
+
+    #[START] Fungsi membuat file output
     orig_stdout = sys.stdout
-    nama_file = "{}NN-output-{}.txt".format(k,eksperimen)
+    nama_file = "{}NN-output-{}.txt".format(k,eksperimen) #Bisa di edit sesuai dengan keinginan
     f = open(nama_file,'w')
     sys.stdout = f
+    #[CONTINUE] Fungsi membuat file output
+
+    #########################################
+    ###[START] PRINT HASIL PROSES ALGORITMA KNN###
+    #########################################
     print "ALGORITMA KNN (VALIDATION MODEL)"
     print " "
     print "Validation Model : Holdout"
@@ -318,7 +368,11 @@ if __name__ == "__main__" :
     prosentase = round(prosentase,1)
     print "Prosentase  : {} %".format(prosentase)
 
+    ########################################
+    ###[END] PRINT HASIL PROSES ALGORITMA KNN###
+    ########################################
 
-
+    #[CONTINUE] Fungsi membuat file output
     sys.stdout = orig_stdout
     f.close
+    #[END] Fungsi membuat file output
