@@ -1,6 +1,6 @@
-# Algorithm KNN
+# Nearest Neighbor Algorithm
 
-Algoritma KNN
+Algoritma K-NN
 File data : Iris.data
 Output berupa file format .txt
 
